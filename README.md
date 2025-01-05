@@ -52,7 +52,7 @@ You can install Reminds either by building from source or downloading pre-built 
    ```
 
 ### Option 2: Download Pre-built Packages
-Visit our [download page]([https://reminds.cybersds.tech]) to get the latest stable builds for:
+Visit our [download page](https://reminds.cybersds.tech) to get the latest stable builds for:
 - Android (.apk)
 - iOS (.ipa)
 - Windows (.exe)
