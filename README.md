@@ -1,6 +1,6 @@
-# Reminds - Flutter Conversation App
+# Reminds - Flutter Conversation Appu
 
-![App Logo](images/favicon.png)
+![App Logo](images/favicon.png
 
 Reminds is a Flutter-based mobile application that generates random conversations and provides a platform for users to engage in meaningful discussions. The app features email-based authentication, multimedia message support, and an intuitive user interface.
 
