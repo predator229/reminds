@@ -1,0 +1,21 @@
+buildscript {
+    repositories {
+        google() // Repositories pour les outils de Google
+        mavenCentral() // Repositories Maven
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.0.2'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.21' // Plugin Kotlin
+    }
+}
+
+allprojects {
+    repositories {
+        google()  // Repositories pour les outils de Google
+        mavenCentral() // Repositories Maven
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir  // Tâche pour nettoyer les fichiers de build
+}
