@@ -67,62 +67,69 @@ class _LoginViewState extends State<LoginView> {
                   ),
                   child : Padding(
                     padding: const EdgeInsets.all(20.0),
-                    child: SizedBox(
-                    height: MediaQuery.of(context).size.height * (iHaveToken ? 1/2 : 1/3),
-                      child: Form(
-                        key: formKey,
-                        child: Column(
-                          children: [
-                          SizedBox(
-                              width: logoWith,
-                              height: logoHeight,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(50),
-                                child: Center(child: Image.asset("images/favicon.png"),),
-                              ),
-                            ),
-                            SizedBox(height: 30,),
-                            Center(child: Text('AUTHENTIFICATION')),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: TextFormField(
-                                controller: emailContainer,
-                                decoration: InputDecoration(
-                                  labelText: 'Email',
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minHeight: MediaQuery.of(context).size.height * (iHaveToken ? 1/2 : 1/3),
+                      ),
+                      child: IntrinsicHeight(
+                        child: SizedBox(
+                          width: 300,
+                          child: Form(
+                            key: formKey,
+                            child: Column(
+                              children: [
+                              SizedBox(
+                                  width: logoWith,
+                                  height: logoHeight,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(50),
+                                    child: Center(child: Image.asset("images/favicon.png"),),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            if (iHaveToken) 
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: TextFormField(
-                                controller: tokenController,
-                                obscureText: true,
-                                decoration: InputDecoration(
-                                  labelText: 'Token',
+                                SizedBox(height: 30,),
+                                Center(child: Text('AUTHENTIFICATINON')),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    controller: emailContainer,
+                                    decoration: InputDecoration(
+                                      labelText: 'Email',
+                                    ),
+                                  ),
                                 ),
-                              ),
+                                if (iHaveToken) 
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextFormField(
+                                    controller: tokenController,
+                                    obscureText: true,
+                                    decoration: InputDecoration(
+                                      labelText: 'Token',
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: TextButton(
+                                    onPressed: (){
+                                      setState(() {
+                                        iHaveToken = !iHaveToken;
+                                      });
+                                    },
+                                    child: Text(iHaveToken ? 'Demander un token' : 'J\'ai mon token !'),
+                                  ),
+                                ),
+                                ElevatedButton(
+                                  onPressed: _loginFunction,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.deepPurple,
+                                    foregroundColor: Colors.white,
+                                  ),
+                                  child: Text('Sign In')
+                                )
+                              ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: TextButton(
-                                onPressed: (){
-                                  setState(() {
-                                    iHaveToken = !iHaveToken;
-                                  });
-                                },
-                                child: Text(iHaveToken ? 'Demander un token' : 'J\'ai mon token !'),
-                              ),
-                            ),
-                            ElevatedButton(
-                              onPressed: _loginFunction,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.deepPurple,
-                                foregroundColor: Colors.white,
-                              ),
-                              child: Text('Sign In')
-                            )
-                          ],
+                          ),
                         ),
                       ),
                     ),
@@ -184,5 +191,4 @@ class _LoginViewState extends State<LoginView> {
     }
   }
   _emailValidateFormat(email){ return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);}
-
 }
