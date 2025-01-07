@@ -81,7 +81,7 @@ class _MessagesViewState extends State<MessagesView> {
   // WIDGET
   Widget _buildFuture(){
     return FutureBuilder<MessageObject>(
-      future: ApiService.fetchMessages(memo),
+      future: ApiService().fetchMessages(memo),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
