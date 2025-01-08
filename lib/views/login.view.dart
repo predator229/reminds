@@ -160,7 +160,7 @@ class _LoginViewState extends State<LoginView> {
     if (token.isEmpty) {
       if (!iHaveToken){
         setState(() {
-          monToken = LoginService().sendToken(email);
+          monToken = LoginService.sendToken(email);
           iHaveToken = true;
         });
         Fluttertoast.showToast(
@@ -173,7 +173,7 @@ class _LoginViewState extends State<LoginView> {
         );
       }
     } else {
-      var state = await LoginService().checkToken(email, token);
+      var state = await LoginService.checkToken(email, token);
       if (state.isCorrectToken) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.of(context).pushReplacement(MyTools().changeRoutePerso(HomePage(), Auth(email: email, token: token))); // ce que je veux utiliser

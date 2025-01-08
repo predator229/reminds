@@ -16,7 +16,7 @@ class HomePage extends StatefulWidget {
 
   @override
   State<HomePage> createState() => _HomePageState();
-  
+
 }
 
 class _HomePageState extends State<HomePage> {
@@ -26,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final auth = ModalRoute.of(context)?.settings.arguments as Auth;
-    monToken = LoginService().checkToken(auth.email, auth.token);
+    monToken = LoginService.checkToken(auth.email, auth.token);
   }
 
   @override
@@ -112,7 +112,7 @@ class _HomePageState extends State<HomePage> {
       decoration: BoxDecoration(
         border: brightness == Brightness.dark ? Border(bottom: BorderSide(color: Color(0xFF505050)) ) : Border(bottom: BorderSide(color: const Color.fromARGB(255, 196, 196, 196))),
       ),
-    
+
       child: Row(
         children: [
           _buildParticipantImage(imagePath),
