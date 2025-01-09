@@ -53,7 +53,7 @@ class LoginService {
     return  AuthentificationToken(error: 0, isSentCodeEmail: false, isCorrectToken: false);
   }
   static Memory emptyMemo() {
-    final discussionInfo =  DiscussionInfo(participant: Participant(name: ""), discussionId: "0", imagePath: "", color: Colors.white);
+    final discussionInfo =  DiscussionInfo(participant: Participant(name: "", email: ""), discussionId: "0", imagePath: "", color: Colors.white);
     final auth = Auth(email: "", token: "");
     return Memory(auth: auth, authToken: startToken(), discussionInfo: discussionInfo);
   }

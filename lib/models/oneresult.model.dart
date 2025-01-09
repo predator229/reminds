@@ -4,10 +4,12 @@ import 'package:reminds/models/participant.model.dart';
 import 'package:reminds/models/photo.model.dart';
 
 class OneResult{
+  String? lastmessageseen;
   List<Participant> participants;
   List<Message> messages;
   List<Photo>? photos;
   OneResult({
+    this.lastmessageseen,
     required this.participants,
     required this.messages,
     this.photos
@@ -17,8 +19,9 @@ class OneResult{
       var messagesJson = json['messages'] as List;
       List<Photo>? allPhotos = [];
 
-      List<Participant> participants = participantsJson.map((p) => Participant(name: p['name'])).toList();
+      List<Participant> participants = participantsJson.map((p) => Participant(name: p['name'], email: p['email'])).toList();
       List<Message> messages = messagesJson.map((m) => Message(
+          message_id: m['message_id'],
           sendername: m['sender_name'] ?? '',
           timestampms: m['timestamp_ms'] ?? 0,
           content: m['content'] ?? '',
@@ -34,7 +37,6 @@ class OneResult{
       ).toList();
       allPhotos.sort((a, b) => a.creationtimestamp.compareTo(b.creationtimestamp));
       messages.sort((a, b) => a.timestampms.compareTo(b.timestampms));
-      
-      return OneResult(participants: participants, messages: messages, photos: allPhotos);
+      return OneResult(lastmessageseen : json['last_message_seen'] ?? '',participants: participants, messages: messages, photos: allPhotos);
   }
 }

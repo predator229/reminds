@@ -41,7 +41,6 @@ class _MessagesViewState extends State<MessagesView> {
 @override
   void initState() {
     super.initState();
-    // monObjet = ApiService.emptyMessageObject();
     memo = LoginService.emptyMemo();
   }
 
@@ -54,7 +53,6 @@ class _MessagesViewState extends State<MessagesView> {
         memo = receivedMemo;
       } 
       if (memo == LoginService.emptyMemo() || memo.auth.email.isEmpty){
-        // monObjet = ApiService.fetchMessages(memo);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.of(context).pushReplacement(MyTools().changeRoutePerso(LoginView(), memo.auth));
         });
@@ -94,6 +92,19 @@ class _MessagesViewState extends State<MessagesView> {
               _originalMessages = snapshot.data?.results.messages;
               messageFiltered = _originalMessages!;
               isDataLoaded = true;
+              
+              final lastReadMessageId = snapshot.data?.results.lastmessageseen;
+              if (lastReadMessageId != null) {
+                final index = _originalMessages!.indexWhere((msg) => msg.message_id == lastReadMessageId);
+                if (index != -1) {
+                  _scrollController.animateTo(
+                    index * 100.0,
+                    duration: const Duration(milliseconds: 500),
+                    curve: Curves.easeInOut,
+                  );
+                }
+              }
+
             });
           });
           return Container();
@@ -105,8 +116,8 @@ class _MessagesViewState extends State<MessagesView> {
   Widget _buildUI() {
       return Scaffold(
         appBar: _buildAppBar(),
-      body: _buildMessageList(),
-      floatingActionButton: _buildFloatActionButton(),
+        body: _buildMessageList(),
+        floatingActionButton: _buildFloatActionButton(),
     );
   }
   FloatingActionButton _buildFloatActionButton(){
@@ -249,6 +260,7 @@ class _MessagesViewState extends State<MessagesView> {
         );
 
         return Padding(
+          key: ValueKey(message.message_id),
           padding: const EdgeInsets.all(8.0),
           child: Column(
             crossAxisAlignment: columAlinment,

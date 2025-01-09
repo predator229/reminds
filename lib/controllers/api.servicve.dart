@@ -12,7 +12,7 @@ class ApiService {
     final datas = {
       "token": memo.auth.token,
       "email" : memo.auth.email,
-      "discursion_name" : memo.discussionInfo.participant.name,
+      "participant" : memo.discussionInfo.participant.email,
       "fromMobil" : 1,
     };
     final response = await http.post(
@@ -28,8 +28,8 @@ class ApiService {
     }
   }
   static Future<MessageObject> emptyMessageObject() async {
-    final participants = Participant(name: "");
-    final messages = Message(sendername: "", timestampms: 0);
+    final participants = Participant(name: "", email: "");
+    final messages = Message(message_id: "", sendername: "", timestampms: 0);
     final results = OneResult(participants: [participants], messages: [messages]);
     return MessageObject(error: 0, results: results);
   }

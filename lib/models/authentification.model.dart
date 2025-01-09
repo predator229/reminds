@@ -25,7 +25,7 @@ class AuthentificationToken {
       if (result['participants'] != null) {
         final participantsJson = result['participants'] as List;
         if (participantsJson.isNotEmpty){
-          List<Participant> participants = participantsJson.map((p) => Participant(name: p['name'])).toList();
+          List<Participant> participants = participantsJson.map((p) => Participant(name: p['name'], email: p['email'],)).toList();
           return AuthentificationToken(
             error: json['error'] as int,
             messageError: json['messageError'] as String?,

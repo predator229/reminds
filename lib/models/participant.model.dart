@@ -1,5 +1,6 @@
 class Participant {
   String name;
-  Participant({required this.name});
+  String email;
+  Participant({required this.name, required this.email});
 }
  
