@@ -123,19 +123,19 @@ class _HomePageState extends State<HomePage> {
   }
 
   String _getImagePath(String name) {
-    return "images/default_user.png";
-  //   return {
-  //     "case1": "images/case1.jpeg",
-  //     "case2": "images/case2.jpeg",
-  //   }[name.toLowerCase().replaceAll(" ", "")] ?? 'images/default_user.png';
+    // return "images/default_user.png";
+    return {
+      "damien": "images/damien.jpeg",
+      "thuret": "images/thuret.jpeg",
+      "isbath": "images/isbath.png",
+    }[name.toLowerCase().replaceAll(" ", "")] ?? 'images/default_user.png';
   }
 
   Color _getColor(String name){
-    return Colors.lightBlueAccent;
-    //   return {
-    //   "case1": Colors.redAccent,
-    //   "case2": Colors.blueAccent,
-    // }[name.toLowerCase().replaceAll(" ", "")] ?? Colors.lightBlueAccent;
+    // return Colors.lightBlueAccent;
+      return {
+      "isbath": Colors.redAccent,
+    }[name.toLowerCase().replaceAll(" ", "")] ?? Colors.lightBlueAccent;
   }
 
   Widget _buildParticipantImage(String imagePath) {

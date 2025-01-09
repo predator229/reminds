@@ -21,7 +21,7 @@ class OneResult{
 
       List<Participant> participants = participantsJson.map((p) => Participant(name: p['name'], email: p['email'])).toList();
       List<Message> messages = messagesJson.map((m) => Message(
-          message_id: m['message_id'],
+          message_id: m['last_message_seen']?.toString(),
           sendername: m['sender_name'] ?? '',
           timestampms: m['timestamp_ms'] ?? 0,
           content: m['content'] ?? '',
@@ -37,6 +37,6 @@ class OneResult{
       ).toList();
       allPhotos.sort((a, b) => a.creationtimestamp.compareTo(b.creationtimestamp));
       messages.sort((a, b) => a.timestampms.compareTo(b.timestampms));
-      return OneResult(lastmessageseen : json['last_message_seen'] ?? '',participants: participants, messages: messages, photos: allPhotos);
+      return OneResult(lastmessageseen : json['last_message_seen']?.toString(),participants: participants, messages: messages, photos: allPhotos);
   }
 }

@@ -2,7 +2,7 @@ import 'package:reminds/models/photo.model.dart';
 import 'package:reminds/models/audio.model.dart';
 
 class Message {
-  String message_id;
+  String? message_id;
   String sendername;
   int timestampms;
   String? content;
@@ -12,7 +12,7 @@ class Message {
   bool showDetailMessage = false;
 
   Message({
-    required this.message_id,
+    this.message_id,
     required this.sendername,
     required this.timestampms,
     this.content,
