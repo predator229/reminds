@@ -15,6 +15,8 @@ import 'package:reminds/views/login.view.dart';
 import 'package:reminds/views/photo.view.dart';
 import 'package:reminds/views/photos.all.view.dart';
 
+import '../controllers/api.servicve.dart';
+
 class MessagesView extends StatefulWidget {
     static const routeName = 'messages';
     const MessagesView({super.key});
@@ -42,6 +44,7 @@ class _MessagesViewState extends State<MessagesView> {
   void initState() {
     super.initState();
     memo = LoginService.emptyMemo();
+    _scrollController.addListener(_onScroll);
   }
 
   @override
@@ -117,7 +120,7 @@ class _MessagesViewState extends State<MessagesView> {
       return Scaffold(
         appBar: _buildAppBar(),
         body: _buildMessageList(),
-        floatingActionButton: _buildFloatActionButton(),
+        // floatingActionButton: _buildFloatActionButton(),
     );
   }
   FloatingActionButton _buildFloatActionButton(){
@@ -431,6 +434,29 @@ class _MessagesViewState extends State<MessagesView> {
     });
   }
 
-  
+  void _onScroll() {
+    if (_scrollController.hasClients) {
+      final RenderBox? box = context.findRenderObject() as RenderBox?;
+      final visibleHeight = box?.size.height ?? 0.0;
+
+        final index = _calculateLastVisibleMessageIndex(
+          _scrollController.offset,
+          visibleHeight,
+        );
+
+      if (index != null && index >= 0 && index < _originalMessages.length) {
+        final lastVisibleMessage = _originalMessages[index];
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ApiService.sendLastMessageSeen(memo, lastVisibleMessage.id);
+      });
+      }
+    }
+  }
+
+int? _calculateLastVisibleMessageIndex(double offset, double visibleHeight) {
+  final itemHeight = 60.0; // Hauteur approximative de chaque élément (à ajuster selon votre layout)
+  return ((offset + visibleHeight) ~/ itemHeight) - 1;
+}
+
 }
 

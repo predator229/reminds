@@ -6,6 +6,7 @@ import 'package:reminds/models/authentification.model.dart';
 import 'package:reminds/models/discussion.info.model.dart';
 import 'package:reminds/models/memory.model.dart';
 import 'package:reminds/models/participant.model.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class LoginService {
   static Future<AuthentificationToken> sendToken(email) async {
@@ -44,6 +45,14 @@ class LoginService {
       jsonResponse['isCorrectToken'] = jsonResponse['error'] == 0;
       jsonResponse['email'] = email;
       jsonResponse['token'] = token;
+      if (jsonResponse['error'] != 0) {
+        Fluttertoast.showToast(
+          msg: "Token incorrect, verifies ton email",
+          gravity: ToastGravity.TOP,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+      }
       return AuthentificationToken.fromJson(jsonResponse);
     } else {
       return startToken();
