@@ -114,6 +114,9 @@ class _LoginViewState extends State<LoginView> {
                                     onPressed: (){
                                       setState(() {
                                         iHaveToken = !iHaveToken;
+                                        // if (!iHaveToken){
+                                        //   tokenController.text = "";
+                                        // }
                                       });
                                     },
                                     child: Text(iHaveToken ? 'Demander un token' : 'J\'ai mon token !'),
@@ -178,15 +181,6 @@ class _LoginViewState extends State<LoginView> {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.of(context).pushReplacement(MyTools().changeRoutePerso(HomePage(), Auth(email: email, token: token))); // ce que je veux utiliser
         });
-      }else{
-        // Fluttertoast.showToast(
-        //   msg: "Le token entre est invalide !",
-        //   toastLength: Toast.LENGTH_SHORT,
-        //   gravity: ToastGravity.TOP,
-        //   backgroundColor: Colors.red,
-        //   textColor: Colors.white,
-        //   fontSize: 16.0,
-        // );
       }
     }
   }

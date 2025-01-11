@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:reminds/models/memory.model.dart';
 import 'package:reminds/models/message.model.dart';
@@ -28,8 +30,8 @@ class ApiService {
     }
   }
 
-static Future<bool> sendLastMessageSeen(Memory memo, String lastVisibleMessage) async {
-    if (memo.auth.token == "" || memo.auth.email == ""){ return emptyMessageObject();}
+static Future<bool> sendLastMessageSeen(Memory memo, String? lastVisibleMessage) async {
+    if (memo.auth.token == "" || memo.auth.email == "" || lastVisibleMessage == "" || lastVisibleMessage == null){ return false;}
     final datas = {
       "token": memo.auth.token,
       "email" : memo.auth.email,
@@ -44,16 +46,16 @@ static Future<bool> sendLastMessageSeen(Memory memo, String lastVisibleMessage) 
     );
     if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
-      return true;
-    } else {
       if (jsonResponse['error'] != 0) {
         Fluttertoast.showToast(
-          msg: "probleme lors de la sauvegarde du dernier message lu. Verifies ta connexion",
+          msg: jsonResponse['message'] ?? "probleme lors de la sauvegarde du dernier message lu. Verifies ta connexion",
           gravity: ToastGravity.TOP,
           backgroundColor: Colors.red,
           textColor: Colors.white,
         );
       }
+      return true;
+    } else{
       return false;
     }
 }

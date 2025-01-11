@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:reminds/controllers/api.login.controller.dart';
 import 'package:reminds/controllers/api.servicve.dart';
 import 'package:reminds/controllers/my.tools.controller.dart';
@@ -9,6 +10,7 @@ import 'package:reminds/models/helper.display.view.dart';
 import 'package:reminds/models/memory.model.dart';
 import 'package:reminds/models/message.model.dart';
 import 'package:reminds/models/messageobject.model.dart';
+import 'package:reminds/models/oneresult.model.dart';
 import 'package:reminds/models/photo.model.dart';
 import 'package:reminds/views/audio.view.dart';
 import 'package:reminds/views/login.view.dart';
@@ -32,7 +34,10 @@ class _MessagesViewState extends State<MessagesView> {
   List<Message>? _originalMessages;
   List<Message>? messageFiltered;
   List<Photo>? allPhotosFirstBuild;
+  OneResult? resultApi;
   late Memory memo;
+
+  final Map<String, GlobalKey> _itemKeys = {};
 
   bool isDataLoaded = false;
   bool showProfil = false;
@@ -44,7 +49,7 @@ class _MessagesViewState extends State<MessagesView> {
   void initState() {
     super.initState();
     memo = LoginService.emptyMemo();
-    _scrollController.addListener(_onScroll);
+    // _scrollController.addListener(_onScroll);
   }
 
   @override
@@ -90,25 +95,34 @@ class _MessagesViewState extends State<MessagesView> {
           return _buildErrorContainer(snapshot.error.toString());
         } else if (snapshot.hasData && snapshot.data != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
+
+            if (snapshot.data?.results.messages != null){
+              final temps = snapshot.data?.results.messages;
+              for (int i=0; i< temps!.length; i++){
+                final message = temps[i];
+                final messageId = message.message_id ?? '';
+                if (messageId.isNotEmpty && !_itemKeys.containsKey(messageId)) {
+                  setState(() {
+                    _itemKeys[messageId] = GlobalKey();
+                  });
+                }
+              }
+              print(_itemKeys);
+            }
+
             setState(() {
+              resultApi = snapshot.data?.results;
               allPhotosFirstBuild = snapshot.data?.results.photos;
               _originalMessages = snapshot.data?.results.messages;
               messageFiltered = _originalMessages!;
               isDataLoaded = true;
-              
-              final lastReadMessageId = snapshot.data?.results.lastmessageseen;
-              if (lastReadMessageId != null) {
-                final index = _originalMessages!.indexWhere((msg) => msg.message_id == lastReadMessageId);
-                if (index != -1) {
-                  _scrollController.animateTo(
-                    index * 100.0,
-                    duration: const Duration(milliseconds: 500),
-                    curve: Curves.easeInOut,
-                  );
-                }
-              }
-
             });
+            // Scroll to the last seen message
+            final lastMessageId = snapshot.data?.results.lastmessageseen;
+            if (lastMessageId != null && _originalMessages != null) {
+              _scrollToLastReadMessage(lastMessageId);
+              print(lastMessageId);
+            }
           });
           return Container();
         }
@@ -235,10 +249,8 @@ class _MessagesViewState extends State<MessagesView> {
     return ListView.builder(
       itemCount: displayedMessages.length,
       itemBuilder: (context, index) {
-
         final message = displayedMessages[index];
         final isMe = message.sendername.toLowerCase().replaceAll(" ", "") != memo.discussionInfo.participant.name.toLowerCase().replaceAll(" ", "");
-        
         final whatIFinalyShow = showProfil;
 
         if (isMe){ showProfil =true; }
@@ -262,8 +274,9 @@ class _MessagesViewState extends State<MessagesView> {
           avatarSize : avatarSize,
         );
 
+        final messageId = message.message_id ?? '';
         return Padding(
-          key: ValueKey(message.message_id),
+          key: _itemKeys[messageId] ?? GlobalKey(),
           padding: const EdgeInsets.all(8.0),
           child: Column(
             crossAxisAlignment: columAlinment,
@@ -399,6 +412,14 @@ class _MessagesViewState extends State<MessagesView> {
         },
         icon: const Icon(Icons.search_outlined),
       ),
+      // if (!showSearchZone)
+      // IconButton(
+      //   padding: const EdgeInsets.all(8.0),
+      //   onPressed: () {
+      //     setState(() { showSearchZone=true;}); //damien
+      //   },
+      //   icon: const Icon(Icons.sav),
+      // ),
       if (showSearchZone)
       IconButton(
         padding: const EdgeInsets.all(8.0),
@@ -422,6 +443,33 @@ class _MessagesViewState extends State<MessagesView> {
     ];
   }
   //FUNCTIONS
+
+  void _scrollToLastReadMessage(String lastMessageId) {
+    if (_itemKeys.containsKey(lastMessageId)) {
+      final context = _itemKeys[lastMessageId]?.currentContext;
+      if (context != null) {
+        Scrollable.ensureVisible(
+          context,
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      } else {
+        Fluttertoast.showToast(
+          msg: "Message with ID $lastMessageId not found in the current list.",
+          gravity: ToastGravity.TOP,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+      }
+    } else {
+      Fluttertoast.showToast(
+        msg: "No key for last seen message found.",
+        gravity: ToastGravity.TOP,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
   crollingFunction(){
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
@@ -434,29 +482,29 @@ class _MessagesViewState extends State<MessagesView> {
     });
   }
 
-  void _onScroll() {
-    if (_scrollController.hasClients) {
-      final RenderBox? box = context.findRenderObject() as RenderBox?;
-      final visibleHeight = box?.size.height ?? 0.0;
-
-        final index = _calculateLastVisibleMessageIndex(
-          _scrollController.offset,
-          visibleHeight,
-        );
-
-      if (index != null && index >= 0 && index < _originalMessages.length) {
-        final lastVisibleMessage = _originalMessages[index];
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          ApiService.sendLastMessageSeen(memo, lastVisibleMessage.id);
-      });
-      }
-    }
-  }
-
-int? _calculateLastVisibleMessageIndex(double offset, double visibleHeight) {
-  final itemHeight = 60.0; // Hauteur approximative de chaque élément (à ajuster selon votre layout)
-  return ((offset + visibleHeight) ~/ itemHeight) - 1;
-}
+//   void _onScroll() {
+//     if (_scrollController.hasClients && _originalMessages != null) {
+//       final RenderBox? box = context.findRenderObject() as RenderBox?;
+//       final visibleHeight = box?.size.height ?? 0.0;
+//
+//         final index = _calculateLastVisibleMessageIndex(
+//           _scrollController.offset,
+//           visibleHeight,
+//         );
+//       if (index != null && index >= 0 && index < _originalMessages!.length) {
+//         final lastVisibleMessage = _originalMessages?[index];
+//         if (lastVisibleMessage?.message_id == null) { return;}
+//         WidgetsBinding.instance.addPostFrameCallback((_) {
+//           ApiService.sendLastMessageSeen(memo, lastVisibleMessage!.message_id);
+//       });
+//       }
+//     }
+//   }
+//
+// int? _calculateLastVisibleMessageIndex(double offset, double visibleHeight) {
+//   final itemHeight = 60.0; // Hauteur approximative de chaque élément (à ajuster selon votre layout)
+//   return ((offset + visibleHeight) ~/ itemHeight) - 1;
+// }
 
 }
 

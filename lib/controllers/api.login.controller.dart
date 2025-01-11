@@ -47,9 +47,9 @@ class LoginService {
       jsonResponse['token'] = token;
       if (jsonResponse['error'] != 0) {
         Fluttertoast.showToast(
-          msg: "Token incorrect, verifies ton email",
+          msg: jsonResponse['message'] ?? "Erreur : Token invalid !",
           gravity: ToastGravity.TOP,
-          backgroundColor: Colors.red,
+          backgroundColor: jsonResponse['error'] == 0 ? Colors.green : Colors.red,
           textColor: Colors.white,
         );
       }
