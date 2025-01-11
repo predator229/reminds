@@ -20,46 +20,55 @@ class _PhotoViewState extends State<PhotoView> {
   @override
   void initState() {
     super.initState();
-    _setPath();
+    // _setPath();
     
 }
-  void _setPath() async {
-    pathToSave = (await getExternalStorageDirectory())!.path;
-    if (mounted) return;
-  }
+  // void _setPath() async {
+  //   try{
+  //     pathToSave = (await getExternalStorageDirectory())!.path;
+  //   }catch(e){
+  //     Fluttertoast.showToast(
+  //       msg: "Ooooh, attend la mise a jour ! :)",
+  //       gravity: ToastGravity.TOP,
+  //       backgroundColor: Colors.red,
+  //       textColor: Colors.white,
+  //     );
+  //   }
+  //   if (mounted) return;
+  // }
 
-  Future<void> _downloadFile(String url, String fileName) async {
-    try {
-      final filePath = '$pathToSave/$fileName';
-      final response = await http.get(Uri.parse(url));
+  // Future<void> _downloadFile(String url, String fileName) async {
+  //   try {
+  //     final filePath = '$pathToSave/$fileName';
+  //     final response = await http.get(Uri.parse(url));
 
-      if (response.statusCode == 200) {
-        final file = File(filePath);
-        await file.writeAsBytes(response.bodyBytes);
+  //     if (response.statusCode == 200) {
+  //       final file = File(filePath);
+  //       await file.writeAsBytes(response.bodyBytes);
 
-        Fluttertoast.showToast(
-          msg: "Telechargement reussi: $filePath",
-          gravity: ToastGravity.TOP,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-        );
-      } else {
-        Fluttertoast.showToast(
-          msg: "Failed to download file",
-          gravity: ToastGravity.TOP,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-        );
-      }
-    } catch (e) {
-      Fluttertoast.showToast(
-        msg: "Ooooh, attend la mise a jour ! :)",
-        gravity: ToastGravity.TOP,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-    }
-  }
+  //       Fluttertoast.showToast(
+  //         msg: "Telechargement reussi: $filePath",
+  //         gravity: ToastGravity.TOP,
+  //         backgroundColor: Colors.green,
+  //         textColor: Colors.white,
+  //       );
+  //     } else {
+  //       Fluttertoast.showToast(
+  //         msg: "Failed to download file",
+  //         gravity: ToastGravity.TOP,
+  //         backgroundColor: Colors.red,
+  //         textColor: Colors.white,
+  //       );
+  //     }
+  //   } catch (e) {
+  //     Fluttertoast.showToast(
+  //       msg: "Ooooh, attend la mise a jour ! :)",
+  //       gravity: ToastGravity.TOP,
+  //       backgroundColor: Colors.red,
+  //       textColor: Colors.white,
+  //     );
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -78,8 +87,8 @@ class _PhotoViewState extends State<PhotoView> {
               padding: const EdgeInsets.all(8.0),
               child: IconButton(
                 onPressed : () async {
-                  final fileName = 'photo_${DateTime.now().millisecondsSinceEpoch}.jpg';
-                  await _downloadFile(instancePhoto.backupuri ?? instancePhoto.uri, fileName);
+                  // final fileName = 'photo_${DateTime.now().millisecondsSinceEpoch}.jpg';
+                  // await _downloadFile(instancePhoto.backupuri ?? instancePhoto.uri, fileName);
                   },
                 icon: Icon(Icons.file_download_rounded),
               ),
@@ -107,9 +116,9 @@ class _PhotoViewState extends State<PhotoView> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: Hero(
-                  tag: instancePhoto.backupuri ?? instancePhoto.uri,
+                  tag: instancePhoto.uri,
                   child: Image.network(
-                    instancePhoto.backupuri ?? instancePhoto.uri,
+                    instancePhoto.uri,
                     width: imgWidth,
                     height: imgHeigth,
                     fit: BoxFit.cover,

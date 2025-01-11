@@ -57,7 +57,7 @@ class PhotosAllView extends StatelessWidget {
         child: ClipRRect(
           child: Hero(
             tag: "ariuvaoiuerbv",
-            child: Image.network(imageI.backupuri ?? imageI.uri),
+            child: Image.network(imageI.uri),
             ),
         ),
       ),

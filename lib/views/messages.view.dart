@@ -16,8 +16,7 @@ import 'package:reminds/views/audio.view.dart';
 import 'package:reminds/views/login.view.dart';
 import 'package:reminds/views/photo.view.dart';
 import 'package:reminds/views/photos.all.view.dart';
-
-import '../controllers/api.servicve.dart';
+import 'package:reminds/views/realod.settings.view.dart';
 
 class MessagesView extends StatefulWidget {
     static const routeName = 'messages';
@@ -44,6 +43,7 @@ class _MessagesViewState extends State<MessagesView> {
 
   var sort = false;
   var showSearchZone = false;
+  var textButtonYes = false;
 
 @override
   void initState() {
@@ -95,21 +95,6 @@ class _MessagesViewState extends State<MessagesView> {
           return _buildErrorContainer(snapshot.error.toString());
         } else if (snapshot.hasData && snapshot.data != null) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-
-            if (snapshot.data?.results.messages != null){
-              final temps = snapshot.data?.results.messages;
-              for (int i=0; i< temps!.length; i++){
-                final message = temps[i];
-                final messageId = message.message_id ?? '';
-                if (messageId.isNotEmpty && !_itemKeys.containsKey(messageId)) {
-                  setState(() {
-                    _itemKeys[messageId] = GlobalKey();
-                  });
-                }
-              }
-              print(_itemKeys);
-            }
-
             setState(() {
               resultApi = snapshot.data?.results;
               allPhotosFirstBuild = snapshot.data?.results.photos;
@@ -117,12 +102,6 @@ class _MessagesViewState extends State<MessagesView> {
               messageFiltered = _originalMessages!;
               isDataLoaded = true;
             });
-            // Scroll to the last seen message
-            final lastMessageId = snapshot.data?.results.lastmessageseen;
-            if (lastMessageId != null && _originalMessages != null) {
-              _scrollToLastReadMessage(lastMessageId);
-              print(lastMessageId);
-            }
           });
           return Container();
         }
@@ -276,7 +255,7 @@ class _MessagesViewState extends State<MessagesView> {
 
         final messageId = message.message_id ?? '';
         return Padding(
-          key: _itemKeys[messageId] ?? GlobalKey(),
+          key: _itemKeys[messageId.toString().toLowerCase()] ?? GlobalKey(),
           padding: const EdgeInsets.all(8.0),
           child: Column(
             crossAxisAlignment: columAlinment,
@@ -316,13 +295,30 @@ class _MessagesViewState extends State<MessagesView> {
                                 color: bgMessage,
                                 borderRadius: BorderRadius.circular(10),
                               ),
-                            child: Text(
+                            child: 
+                            textButtonYes ? 
+                              TextButton(
+                                onPressed: () {
+                                  ApiService.sendLastMessageSeen(memo, message.message_id);
+                                  setState(() { textButtonYes = false;});
+                                },
+                                child: Text(
+                                  message.content!,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: msgMessage,
+                                  ),
+                                ),
+                              )
+                            :
+                            Text(
                                 message.content!,
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: msgMessage,
                                 ),
                               ),
+                            
                           ),
                         ],
                       ),
@@ -344,7 +340,7 @@ class _MessagesViewState extends State<MessagesView> {
       },
       controller: _scrollController,
     );
-  }
+  }  
   Widget _buildImagePreview(List<Photo> photos, HelperDisplayView helper) {
     return Column(
       children: photos.map((photo) {
@@ -375,9 +371,9 @@ class _MessagesViewState extends State<MessagesView> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Hero(
-                      tag: photo.backupuri ?? photo.uri,
+                      tag: photo.uri,
                       child: Image.network(
-                        photo.backupuri ?? photo.uri,
+                        photo.uri,
                         width: 240,
                         height: 440,
                         fit: BoxFit.cover,
@@ -412,14 +408,6 @@ class _MessagesViewState extends State<MessagesView> {
         },
         icon: const Icon(Icons.search_outlined),
       ),
-      // if (!showSearchZone)
-      // IconButton(
-      //   padding: const EdgeInsets.all(8.0),
-      //   onPressed: () {
-      //     setState(() { showSearchZone=true;}); //damien
-      //   },
-      //   icon: const Icon(Icons.sav),
-      // ),
       if (showSearchZone)
       IconButton(
         padding: const EdgeInsets.all(8.0),
@@ -440,36 +428,66 @@ class _MessagesViewState extends State<MessagesView> {
         },
         icon: const Icon(Icons.sort),
       ),
+      if (!showSearchZone)
+      PopupMenuButton<String>(
+        icon: const Icon(Icons.more_vert), // Icône des trois petits points
+        onSelected: (value) {
+          if (value == '__save') {
+            setState(() { textButtonYes = true;});
+            Fluttertoast.showToast(
+              msg: "Selectionne le message a enregistrer 3n tant que dernier message lu",
+              gravity: ToastGravity.TOP,
+              backgroundColor: Colors.green,
+              textColor: Colors.white,
+            );
+          } else if (value == '__refresh_from_beginning') {
+            Navigator.pushNamed(context, ReloadSettingsView.routeName, arguments: memo);
+          }
+        },
+        itemBuilder: (context) => [
+          PopupMenuItem(
+            value: '__save',
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  IconButton(
+                    padding: const EdgeInsets.all(8.0),
+                    onPressed: () {},
+                    icon:const Icon(Icons.save_outlined),
+                  ),
+                  Flexible(child: const Text('Enregistrer le dernier message lu')),
+                ],
+              ),
+            ),
+          ),
+          PopupMenuItem(
+            value: '__refresh_from_beginning',
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  IconButton(
+                    padding: const EdgeInsets.all(8.0),
+                    onPressed: () {},
+                    icon: const Icon(Icons.refresh_outlined),
+                  ),
+                  const Text('Raffraichir depuis le début'),
+                ],
+              ),
+            ),
+          ),
+          const PopupMenuDivider(), // Ligne de séparation
+        ],
+      ),
     ];
   }
   //FUNCTIONS
 
-  void _scrollToLastReadMessage(String lastMessageId) {
-    if (_itemKeys.containsKey(lastMessageId)) {
-      final context = _itemKeys[lastMessageId]?.currentContext;
-      if (context != null) {
-        Scrollable.ensureVisible(
-          context,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
-      } else {
-        Fluttertoast.showToast(
-          msg: "Message with ID $lastMessageId not found in the current list.",
-          gravity: ToastGravity.TOP,
-          backgroundColor: Colors.red,
-          textColor: Colors.white,
-        );
-      }
-    } else {
-      Fluttertoast.showToast(
-        msg: "No key for last seen message found.",
-        gravity: ToastGravity.TOP,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-    }
-  }
   crollingFunction(){
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
@@ -507,4 +525,3 @@ class _MessagesViewState extends State<MessagesView> {
 // }
 
 }
-

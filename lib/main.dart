@@ -6,6 +6,7 @@ import 'package:reminds/views/login.view.dart';
 import 'package:reminds/views/messages.view.dart';
 import 'package:reminds/views/photo.view.dart';
 import 'package:reminds/views/photos.all.view.dart';
+import 'package:reminds/views/realod.settings.view.dart';
 
 void main() {
   runApp(const MyMainActivity());
@@ -32,6 +33,7 @@ class _MyMainActivityState extends State<MyMainActivity> {
         PhotosAllView.routeName : (context) => PhotosAllView(),
         HomePage.routeName : (context) => HomePage(),
         InternalImageView.routeName : (context) => InternalImageView(),
+        ReloadSettingsView.routeName : (context) => ReloadSettingsView(),
       },
       initialRoute: LoadingView.routeName,
     );

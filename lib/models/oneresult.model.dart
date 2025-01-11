@@ -21,7 +21,7 @@ class OneResult{
 
       List<Participant> participants = participantsJson.map((p) => Participant(name: p['name'], email: p['email'])).toList();
       List<Message> messages = messagesJson.map((m) => Message(
-          message_id: m['last_message_seen']?.toString(),
+          message_id: m['message_id']?.toString(),
           sendername: m['sender_name'] ?? '',
           timestampms: m['timestamp_ms'] ?? 0,
           content: m['content'] ?? '',
