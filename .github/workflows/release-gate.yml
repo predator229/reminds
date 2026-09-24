@@ -1,0 +1,23 @@
+name: Release gate
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, edited]
+
+jobs:
+  only-dev-into-main:
+    name: only-dev-into-main
+    runs-on: ubuntu-latest
+    steps:
+      - name: Only dev may be merged into main
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          THIS_REPO: ${{ github.repository }}
+        run: |
+          if [ "$HEAD_REF" != "dev" ] || [ "$HEAD_REPO" != "$THIS_REPO" ]; then
+            echo "::error::Only the dev branch of $THIS_REPO can be merged into main (got $HEAD_REPO:$HEAD_REF). Open your PR against dev."
+            exit 1
+          fi
+          echo "OK: dev -> main"
